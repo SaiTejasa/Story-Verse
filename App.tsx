@@ -125,20 +125,28 @@ const App: React.FC = () => {
           </div>
           
           <div className="flex items-center space-x-4">
+            {/* AETHERIS AI SHINING BUTTON */}
             <button 
               onClick={() => setIsChatOpen(true)} 
-              className="group relative h-10 px-6 flex items-center justify-center overflow-hidden rounded-full font-cinzel text-[10px] font-bold tracking-[0.3em] text-white transition-all hover:shadow-[0_0_30px_rgba(99,102,241,0.3)] active:scale-95"
+              className="group relative h-10 px-8 flex items-center justify-center overflow-hidden rounded-full font-cinzel text-[9px] font-bold tracking-[0.4em] text-white transition-all active:scale-95 shadow-[0_0_20px_rgba(99,102,241,0.1)]"
             >
-              {/* Shining/Moving Border Effect */}
-              <div className="absolute inset-0 bg-zinc-900 border border-white/10" />
-              <div className="absolute inset-[-100%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_0deg_at_50%_50%,transparent_0%,#6366f1_20%,transparent_40%,#a855f7_60%,transparent_80%,transparent_100%)] opacity-40 group-hover:opacity-100" />
-              <div className="absolute inset-[1px] bg-zinc-950 rounded-full" />
-              {/* Shining Sweep */}
-              <div className="absolute inset-0 opacity-0 group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%]" />
-              <span className="relative z-10">AETHERIS AI</span>
+              {/* Spinning Border Container */}
+              <div className="absolute inset-0 bg-zinc-950 border border-white/10 rounded-full" />
+              <div className="absolute inset-[-400%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_0deg_at_50%_50%,transparent_0%,transparent_40%,#6366f1_50%,transparent_60%,transparent_100%)] opacity-40 group-hover:opacity-100" />
+              <div className="absolute inset-[1.5px] bg-zinc-950 rounded-full" />
+
+              {/* Shining Sweep Effect */}
+              <div className="absolute inset-0 w-full h-full">
+                <div className="absolute inset-0 w-[40px] h-full bg-white/10 skew-x-[45deg] -translate-x-[300%] animate-[shining_2.5s_ease-in-out_infinite] group-hover:bg-white/20" />
+              </div>
+              
+              <div className="relative z-10 flex items-center space-x-2">
+                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full group-hover:animate-ping" />
+                <span>AETHERIS AI</span>
+              </div>
             </button>
 
-            <button onClick={() => setIsMapOpen(true)} className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full text-[10px] font-bold font-cinzel tracking-[0.3em] shadow-xl shadow-indigo-900/20 active:scale-95 transition-all">VERSE NAVIGATOR</button>
+            <button onClick={() => setIsMapOpen(true)} className="px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-full text-[10px] font-bold font-cinzel tracking-[0.3em] border border-white/5 shadow-xl active:scale-95 transition-all">VERSE NAVIGATOR</button>
           </div>
         </header>
 
@@ -179,9 +187,14 @@ const App: React.FC = () => {
       </main>
 
       <style>{`
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
+        @keyframes shining {
+          0% { transform: translateX(-300%) skewX(45deg); }
+          50% { transform: translateX(300%) skewX(45deg); }
+          100% { transform: translateX(300%) skewX(45deg); }
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
       `}</style>
     </div>

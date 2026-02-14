@@ -37,6 +37,13 @@ export interface ChatMessage {
   timestamp: number;
 }
 
+export interface ChatSession {
+  id: string;
+  title: string;
+  messages: ChatMessage[];
+  updatedAt: number;
+}
+
 export interface UserProgress {
   userId: string;
   lastStoryId: string;
@@ -44,5 +51,6 @@ export interface UserProgress {
   likes: Set<string>;
   ratings: Record<string, number>;
   bookmarks: Record<string, number[]>;
-  chatHistory: ChatMessage[];
+  chats: ChatSession[];
+  currentChatId: string;
 }

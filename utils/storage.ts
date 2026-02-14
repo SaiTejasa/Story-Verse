@@ -1,7 +1,7 @@
 
-import { UserProgress, ChatMessage } from '../types';
+import { UserProgress, ChatMessage, ChatSession } from '../types';
 
-const STORAGE_KEY = 'st_universe_user_data';
+const STORAGE_KEY = 'st_universe_user_data_v2'; // Version bump for new structure
 
 const getOrGenerateUserId = (): string => {
   let userId = localStorage.getItem('st_universe_user_id');
@@ -23,7 +23,8 @@ export const getUserProgress = (): UserProgress => {
       ...parsed,
       likes: new Set(parsed.likes || []),
       bookmarks: parsed.bookmarks || {},
-      chatHistory: parsed.chatHistory || [],
+      chats: parsed.chats || [],
+      currentChatId: parsed.currentChatId || '',
     };
   }
 
@@ -34,7 +35,8 @@ export const getUserProgress = (): UserProgress => {
     likes: new Set(),
     ratings: {},
     bookmarks: {},
-    chatHistory: [],
+    chats: [],
+    currentChatId: '',
   };
 };
 

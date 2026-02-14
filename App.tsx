@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Story, UserProgress, ChatMessage } from './types';
+import { Story, UserProgress, ChatMessage, ChatSession } from './types';
 import { UNIVERSES } from './constants';
 import { getUserProgress, saveUserProgress, syncEngagement } from './utils/storage';
 import Sidebar from './components/Sidebar';
@@ -50,9 +50,9 @@ const App: React.FC = () => {
     setIsMapOpen(false);
   };
 
-  const handleUpdateChatHistory = (history: ChatMessage[]) => {
+  const handleUpdateChats = (chats: ChatSession[], currentId: string) => {
     setProgress(prev => {
-      const updated = { ...prev, chatHistory: history };
+      const updated = { ...prev, chats, currentChatId: currentId };
       saveUserProgress(updated);
       return updated;
     });
@@ -125,28 +125,28 @@ const App: React.FC = () => {
           </div>
           
           <div className="flex items-center space-x-4">
-            {/* AETHERIS AI SHINING BUTTON */}
             <button 
               onClick={() => setIsChatOpen(true)} 
-              className="group relative h-10 px-8 flex items-center justify-center overflow-hidden rounded-full font-cinzel text-[9px] font-bold tracking-[0.4em] text-white transition-all active:scale-95 shadow-[0_0_20px_rgba(99,102,241,0.1)]"
+              className="group relative h-10 px-8 flex items-center justify-center overflow-hidden rounded-full font-cinzel text-[9px] font-bold tracking-[0.4em] text-white transition-all active:scale-95 shadow-[0_0_30px_rgba(99,102,241,0.2)]"
             >
-              {/* Spinning Border Container */}
-              <div className="absolute inset-0 bg-zinc-950 border border-white/10 rounded-full" />
-              <div className="absolute inset-[-400%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_0deg_at_50%_50%,transparent_0%,transparent_40%,#6366f1_50%,transparent_60%,transparent_100%)] opacity-40 group-hover:opacity-100" />
-              <div className="absolute inset-[1.5px] bg-zinc-950 rounded-full" />
-
-              {/* Shining Sweep Effect */}
-              <div className="absolute inset-0 w-full h-full">
-                <div className="absolute inset-0 w-[40px] h-full bg-white/10 skew-x-[45deg] -translate-x-[300%] animate-[shining_2.5s_ease-in-out_infinite] group-hover:bg-white/20" />
+              <div className="absolute inset-0 bg-zinc-950 rounded-full" />
+              <div className="absolute inset-[-400%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_0deg_at_50%_50%,transparent_0%,transparent_40%,#6366f1_50%,transparent_60%,transparent_100%)] opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute inset-[1px] bg-zinc-950 rounded-full" />
+              <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-full">
+                <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[30deg] animate-[shining_3s_infinite_ease-in-out]" />
+              </div>
+              <div className="relative z-10 flex items-center space-x-2">
+                <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
+                <span className="group-hover:text-indigo-300 transition-colors uppercase">AETHERIS AI</span>
               </div>
               
-              <div className="relative z-10 flex items-center space-x-2">
-                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full group-hover:animate-ping" />
-                <span>AETHERIS AI</span>
+              {/* Shortcut Hint on Hover */}
+              <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-zinc-900 border border-white/10 px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+                <p className="text-[7px] text-zinc-500 uppercase tracking-widest font-bold">Press Ctrl+Shift+O for new chat</p>
               </div>
             </button>
 
-            <button onClick={() => setIsMapOpen(true)} className="px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-full text-[10px] font-bold font-cinzel tracking-[0.3em] border border-white/5 shadow-xl active:scale-95 transition-all">VERSE NAVIGATOR</button>
+            <button onClick={() => setIsMapOpen(true)} className="px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-full text-[10px] font-bold font-cinzel tracking-[0.3em] border border-white/5 shadow-xl active:scale-95 transition-all">AETHERIS NEXUS</button>
           </div>
         </header>
 
@@ -170,7 +170,7 @@ const App: React.FC = () => {
                 <p className="text-zinc-400 text-lg md:text-xl font-light italic leading-relaxed font-cinzel opacity-60">"The architecture of imagination, rendered in light."</p>
               </div>
               <div className="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 mt-14">
-                <button onClick={() => setIsMapOpen(true)} className="w-full md:w-auto px-12 py-5 bg-white text-black font-cinzel font-bold tracking-[0.5em] text-[10px] rounded-full hover:bg-zinc-200 transition-all shadow-[0_0_50px_rgba(255,255,255,0.1)] active:scale-95 uppercase">Access Verse Navigator</button>
+                <button onClick={() => setIsMapOpen(true)} className="w-full md:w-auto px-12 py-5 bg-white text-black font-cinzel font-bold tracking-[0.5em] text-[10px] rounded-full hover:bg-zinc-200 transition-all shadow-[0_0_50px_rgba(255,255,255,0.1)] active:scale-95 uppercase">Access Aetheris Nexus</button>
                 <button onClick={() => setIsChatOpen(true)} className="w-full md:w-auto px-12 py-5 bg-indigo-600 text-white font-cinzel font-bold tracking-[0.5em] text-[10px] rounded-full hover:bg-indigo-500 transition-all shadow-[0_0_50px_rgba(99,102,241,0.2)] active:scale-95 uppercase">Consult Aetheris</button>
               </div>
             </div>
@@ -181,16 +181,16 @@ const App: React.FC = () => {
         <ChatBot 
           isOpen={isChatOpen} 
           onClose={() => setIsChatOpen(false)} 
-          history={progress.chatHistory}
-          onUpdateHistory={handleUpdateChatHistory}
+          chats={progress.chats}
+          currentChatId={progress.currentChatId}
+          onUpdateChats={handleUpdateChats}
         />
       </main>
 
       <style>{`
         @keyframes shining {
-          0% { transform: translateX(-300%) skewX(45deg); }
-          50% { transform: translateX(300%) skewX(45deg); }
-          100% { transform: translateX(300%) skewX(45deg); }
+          0% { left: -100%; }
+          100% { left: 200%; }
         }
         @keyframes spin {
           from { transform: rotate(0deg); }

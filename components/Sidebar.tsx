@@ -45,7 +45,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onSelectStory, onGoHome, onOpenAether
             <button 
               onClick={() => setIsOpen(false)} 
               className="text-zinc-500 hover:text-white p-2 rounded-xl hover:bg-white/5 transition-colors shrink-0"
-              title="Close Sidebar"
             >
               <svg className={`transition-all duration-300 ${isScrolled ? 'w-5 h-5 md:w-6 md:h-6' : 'w-6 h-6 md:w-8 md:h-8'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -63,11 +62,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onSelectStory, onGoHome, onOpenAether
               <div className={`relative h-full w-full rounded-2xl bg-zinc-950 transition-all duration-300 ${isScrolled ? 'p-3 md:p-4' : 'p-4 md:p-6'}`}>
                 <div className="flex items-center space-x-3 md:space-x-4">
                   <div className={`bg-indigo-600 rounded-xl flex items-center justify-center text-white shrink-0 transition-all duration-300 ${isScrolled ? 'w-8 h-8 md:w-10 md:h-10' : 'w-10 h-10 md:w-12 md:h-12'}`}>
-                    <svg className={`transition-all duration-300 ${isScrolled ? 'w-4 h-4 md:w-5 md:h-5' : 'w-5 h-5 md:w-6 md:h-6'}`} fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1a1 1 0 112 0v1a1 1 0 11-2 0zM13 16v-1a1 1 0 112 0v1a1 1 0 11-2 0zM14.95 13.536a1 1 0 10-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM6.464 14.95a1 1 0 10-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707z" /></svg>
+                    <svg className={`transition-all duration-300 ${isScrolled ? 'w-4 h-4 md:w-5 md:h-5' : 'w-5 h-5 md:w-6 md:h-6'}`} fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1a1 1 0 112 0v1a1 1 0 11-2 0zM13 16v-1a1 1 0 112 0v1a1 1 0 11-2 0zM14.95 13.536a1 1 0 10-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM6.464 14.95a1 1 0 10-1.414-1.414l-.707.707a1 1 0 00-1.414 1.414l.707-.707z" /></svg>
                   </div>
                   <div className="text-left overflow-hidden">
                     <p className={`text-white font-cinzel font-bold tracking-[0.1em] uppercase leading-none truncate transition-all duration-300 ${isScrolled ? 'text-[9px] md:text-[10px]' : 'text-[10px] md:text-xs'}`}>Consult AI</p>
-                    <p className={`text-indigo-400 font-bold uppercase tracking-[0.2em] mt-1 truncate transition-all duration-300 ${isScrolled ? 'text-[7px] md:text-[8px]' : 'text-[8px] md:text-[9px]'}`}>With Aetheris AI</p>
+                    <p className={`text-indigo-400 font-bold uppercase tracking-[0.2em] mt-1 truncate transition-all duration-300 ${isScrolled ? 'text-[7px] md:text-[8px]' : 'text-[8px] md:text-[9px]'}`}>With Aetheris</p>
                   </div>
                 </div>
               </div>

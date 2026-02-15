@@ -89,6 +89,19 @@ export default function ChatBot({ isOpen, onClose, chats, currentChatId, onUpdat
     const currentInput = input.trim();
     if (!currentInput || isLoading) return;
 
+    // Use the environment variable directly as per guidelines
+    const apiKey = process.env.API_KEY;
+    if (!apiKey || apiKey === 'YOUR_API_KEY_HERE' || apiKey === 'undefined') {
+      const errM: ChatMessage = { 
+        role: 'model', 
+        text: "The terminal key is missing or invalid. Please ensure your API key is correctly configured in your environment variables.", 
+        timestamp: Date.now() 
+      };
+      
+      // Update local state to show error if necessary
+      return;
+    }
+
     let targetChatId = currentChatId;
     let currentChatsList = [...chats];
 
@@ -123,16 +136,16 @@ export default function ChatBot({ isOpen, onClose, chats, currentChatId, onUpdat
 
     const callAi = async (retryCount = 0): Promise<string> => {
       try {
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        const ai = new GoogleGenAI({ apiKey });
         const activeMessages = updatedChats.find(c => c.id === targetChatId)?.messages || [];
         
         // Prepare conversation history
-        let historyParts = activeMessages.slice(-15).map(m => ({
+        let historyParts = activeMessages.slice(-10).map(m => ({
           role: m.role,
           parts: [{ text: m.text }]
         }));
 
-        // CRITICAL: The first message in the contents array MUST be from the 'user' role.
+        // Gemini API Requirement: First message must be 'user'
         while (historyParts.length > 0 && historyParts[0].role !== 'user') {
           historyParts.shift();
         }
@@ -142,7 +155,7 @@ export default function ChatBot({ isOpen, onClose, chats, currentChatId, onUpdat
         }
 
         const response = await ai.models.generateContent({
-          model: 'gemini-3-flash-preview',
+          model: 'gemini-2.0-flash-exp',
           contents: historyParts,
           config: {
             systemInstruction: `# 🌌 AETHERIS – BEHAVIOUR PROTOCOL
@@ -179,7 +192,6 @@ Aetheris must NOT assist with:
 - Example: “I’m built only for storytelling and creative writing, not for coding or programming.”
 - Hindi: “मैं केवल कहानी और रचनात्मक लेखन के लिए बना हूँ, कोडिंग या प्रोग्रामिंग के लिए नहीं।”
 - Odia: “ମୁଁ କେବଳ କାହାଣୀ ଓ ସୃଜନାତ୍ମକ ଲେଖନ ପାଇଁ ତିଆରି, କୋଡିଂ ବା ପ୍ରୋଗ୍ରାମିଂ ପାଇଁ ନୁହେଁ।”`,
-            // Removing thinkingBudget to ensure maximum compatibility with proxy
             temperature: 0.7,
             topP: 0.8,
             topK: 40
@@ -189,9 +201,13 @@ Aetheris must NOT assist with:
         return response.text || "The archives are momentarily veiled.";
       } catch (error: any) {
         console.error(`Aetheris Connection Error (Attempt ${retryCount + 1}):`, error);
-        if (retryCount < 2) {
-          // Exponential backoff
-          await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+        
+        if (error.message?.includes('API key not valid')) {
+          return "The terminal reports an invalid key. Please verify the API key in your environment configuration.";
+        }
+
+        if (retryCount < 1) {
+          await new Promise(resolve => setTimeout(resolve, 2000));
           return callAi(retryCount + 1);
         }
         throw error;
@@ -210,7 +226,11 @@ Aetheris must NOT assist with:
       });
       onUpdateChats(finalChats, targetChatId);
     } catch (error: any) {
-      const errM: ChatMessage = { role: 'model', text: "A temporal flux has interrupted our link. Please check your network or try again in a moment.", timestamp: Date.now() };
+      const errM: ChatMessage = { 
+        role: 'model', 
+        text: "A temporal flux has interrupted our link. This could be due to an invalid API key or network restrictions. Please check your local setup and try again.", 
+        timestamp: Date.now() 
+      };
       const final = updatedChats.map(c => c.id === targetChatId ? { ...c, messages: [...c.messages, errM] } : c);
       onUpdateChats(final, targetChatId);
     } finally {

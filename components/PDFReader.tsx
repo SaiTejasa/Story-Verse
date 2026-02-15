@@ -116,9 +116,11 @@ export default function PDFReader({
   useEffect(() => {
     const loadPdf = async () => {
       setLoading(true);
-      setRenderMode('canvas');
+      // For local development or restricted CORS, iframe is much safer
       try {
-        const response = await fetch(driveInfo.downloadUrl);
+        const response = await fetch(driveInfo.downloadUrl, { mode: 'cors' });
+        if (!response.ok) throw new Error('CORS or network error');
+        
         const blob = await response.blob();
         const arrayBuffer = await blob.arrayBuffer();
         const loadingTask = (window as any).pdfjsLib.getDocument({ 
@@ -129,9 +131,11 @@ export default function PDFReader({
         const pdf = await loadingTask.promise;
         pdfInstance.current = pdf;
         setNumPages(pdf.numPages);
-        setLoading(false);
+        setRenderMode('canvas');
       } catch (err) {
+        console.warn('Falling back to iframe preview for Drive file:', err);
         setRenderMode('iframe');
+      } finally {
         setLoading(false);
       }
     };
@@ -219,7 +223,14 @@ export default function PDFReader({
             <p className="font-cinzel text-xs tracking-[0.3em] text-zinc-500 uppercase">Manifesting Narrative...</p>
           </div>
         ) : renderMode === 'iframe' ? (
-          <div className="w-full h-[80vh] border border-white/5 rounded-3xl overflow-hidden"><iframe src={driveInfo.previewUrl} title="PDF Preview" className="w-full h-full" allow="autoplay" /></div>
+          <div className="w-full h-[80vh] border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
+            <iframe 
+              src={driveInfo.previewUrl} 
+              title="PDF Preview" 
+              className="w-full h-full bg-white" 
+              allow="autoplay; encrypted-media" 
+            />
+          </div>
         ) : (
           <div>
             <div className="mb-24 text-center">

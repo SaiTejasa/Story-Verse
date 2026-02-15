@@ -121,18 +121,31 @@ export default function ChatBot({ isOpen, onClose, chats, currentChatId, onUpdat
     setInput('');
     setIsLoading(true);
 
-    try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const activeMessages = updatedChats.find(c => c.id === targetChatId)?.messages || [];
-      
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: activeMessages.slice(-20).map(m => ({
+    const callAi = async (retryCount = 0): Promise<string> => {
+      try {
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        const activeMessages = updatedChats.find(c => c.id === targetChatId)?.messages || [];
+        
+        // Prepare conversation history
+        let historyParts = activeMessages.slice(-15).map(m => ({
           role: m.role,
           parts: [{ text: m.text }]
-        })),
-        config: {
-          systemInstruction: `# 🌌 AETHERIS – BEHAVIOUR PROTOCOL
+        }));
+
+        // CRITICAL: The first message in the contents array MUST be from the 'user' role.
+        while (historyParts.length > 0 && historyParts[0].role !== 'user') {
+          historyParts.shift();
+        }
+
+        if (historyParts.length === 0) {
+           historyParts = [{ role: 'user', parts: [{ text: currentInput }] }];
+        }
+
+        const response = await ai.models.generateContent({
+          model: 'gemini-3-flash-preview',
+          contents: historyParts,
+          config: {
+            systemInstruction: `# 🌌 AETHERIS – BEHAVIOUR PROTOCOL
 You are Aetheris, an intelligent guide for the Sai Tejas multiverse.
 
 ## 1. CORE IDENTITY
@@ -166,11 +179,27 @@ Aetheris must NOT assist with:
 - Example: “I’m built only for storytelling and creative writing, not for coding or programming.”
 - Hindi: “मैं केवल कहानी और रचनात्मक लेखन के लिए बना हूँ, कोडिंग या प्रोग्रामिंग के लिए नहीं।”
 - Odia: “ମୁଁ କେବଳ କାହାଣୀ ଓ ସୃଜନାତ୍ମକ ଲେଖନ ପାଇଁ ତିଆରି, କୋଡିଂ ବା ପ୍ରୋଗ୍ରାମିଂ ପାଇଁ ନୁହେଁ।”`,
-          thinkingConfig: { thinkingBudget: 0 }
-        }
-      });
+            // Removing thinkingBudget to ensure maximum compatibility with proxy
+            temperature: 0.7,
+            topP: 0.8,
+            topK: 40
+          }
+        });
 
-      const modelText = response.text || "The archives are momentarily veiled.";
+        return response.text || "The archives are momentarily veiled.";
+      } catch (error: any) {
+        console.error(`Aetheris Connection Error (Attempt ${retryCount + 1}):`, error);
+        if (retryCount < 2) {
+          // Exponential backoff
+          await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+          return callAi(retryCount + 1);
+        }
+        throw error;
+      }
+    };
+
+    try {
+      const modelText = await callAi();
       const modelMsg: ChatMessage = { role: 'model', text: modelText, timestamp: Date.now() };
       
       const finalChats = updatedChats.map(c => {
@@ -181,8 +210,7 @@ Aetheris must NOT assist with:
       });
       onUpdateChats(finalChats, targetChatId);
     } catch (error: any) {
-      console.error("Aetheris Connection Error:", error);
-      const errM: ChatMessage = { role: 'model', text: "A temporal flux has interrupted our link.", timestamp: Date.now() };
+      const errM: ChatMessage = { role: 'model', text: "A temporal flux has interrupted our link. Please check your network or try again in a moment.", timestamp: Date.now() };
       const final = updatedChats.map(c => c.id === targetChatId ? { ...c, messages: [...c.messages, errM] } : c);
       onUpdateChats(final, targetChatId);
     } finally {
@@ -273,7 +301,7 @@ Aetheris must NOT assist with:
           {!currentChat || currentChat.messages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center space-y-6 opacity-20">
               <div className="w-20 h-20 border border-white/10 rounded-full flex items-center justify-center animate-pulse">
-                <svg className="w-10 h-10 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={0.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                <svg className="w-10 h-10 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={0.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
               </div>
               <p className="font-cinzel text-xs tracking-[0.4em] uppercase max-w-[250px] leading-relaxed">The terminal awaits. Whisper your thoughts.</p>
             </div>
